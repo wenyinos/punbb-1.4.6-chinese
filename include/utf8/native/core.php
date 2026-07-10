@@ -31,7 +31,7 @@ if ( !defined('UTF8_CORE') ) {
 * @subpackage strings
 */
 function utf8_strlen($str){
-    return strlen(utf8_decode($str));
+    return mb_strlen($str, 'UTF-8');
 }
 
 
@@ -175,7 +175,7 @@ function utf8_substr($str, $offset, $length = NULL) {
     if ($offset < 0) {
 
         // see notes
-        $strlen = strlen(utf8_decode($str));
+        $strlen = mb_strlen($str, 'UTF-8');
         $offset = $strlen + $offset;
         if ($offset < 0) $offset = 0;
 
@@ -214,7 +214,7 @@ function utf8_substr($str, $offset, $length = NULL) {
 
         if (!isset($strlen)) {
             // see notes
-            $strlen = strlen(utf8_decode($str));
+            $strlen = mb_strlen($str, 'UTF-8');
         }
 
         // another trivial case

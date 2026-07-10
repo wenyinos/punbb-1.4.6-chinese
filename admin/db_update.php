@@ -246,7 +246,7 @@ function convert_to_utf8(&$str, $old_charset)
 	if (!seems_utf8($str))
 	{
 		if ($old_charset == 'ISO-8859-1')
-			$str = utf8_encode($str);
+			$str = mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
 		else if (function_exists('iconv'))
 			$str = iconv($old_charset, 'UTF-8', $str);
 		else if (function_exists('mb_convert_encoding'))

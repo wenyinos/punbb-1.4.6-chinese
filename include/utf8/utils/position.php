@@ -43,7 +43,7 @@ function utf8_byte_position() {
     $i = utf8_locate_next_chr($str, 300);
 
     // $c -> character offset into $str
-    $c = strlen(utf8_decode(substr($str,0,$i)));
+    $c = mb_strlen(substr($str,0,$i), 'UTF-8');
 
     // deal with arguments from lowest to highest
     sort($args);
@@ -76,10 +76,10 @@ function utf8_byte_position() {
 
             if ($j > $i) {
                 // determine new character offset
-                $c += strlen(utf8_decode(substr($str,$i,$j-$i)));
+                $c += mb_strlen(substr($str,$i,$j-$i), 'UTF-8');
             } else {
                 // ditto
-                $c -= strlen(utf8_decode(substr($str,$j,$i-$j)));
+                $c -= mb_strlen(substr($str,$j,$i-$j), 'UTF-8');
             }
 
             $error = abs($c-$offset);

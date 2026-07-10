@@ -1,0 +1,11 @@
+Subject: 版块新主题：<forum_name>
+
+<topic_starter> 在您订阅的版块中创建了新主题 <topic_subject>。
+
+新主题位于 <topic_url>
+
+您可以前往 <unsubscribe_url> 取消订阅
+
+--
+<board_mailer>
+（请勿回复此消息）

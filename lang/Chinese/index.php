@@ -1,0 +1,48 @@
+<?php
+
+// Language definitions used in index.php
+$lang_index = array(
+
+'Moderated by'				=>	'版主：%s',
+'Link to'					=>	'链接到 %s',
+'Category subtitle'			=>	'本分类中有 %1$s 个版块，共 %2$s',
+'Forums'					=>	'版块',
+'Topics'					=>	'主题',
+'Posts'						=>	'帖子',
+'Last post'					=>	'最新帖子：',
+'last post'					=>	'最新帖子',
+'topics'					=>	'主题',
+'topic'						=>	'主题',
+'post'						=>	'帖子',
+'posts'						=>	'帖子',
+'No topic info'				=>	'暂无主题信息',
+'No post info'				=>	'暂无帖子信息',
+'No lastpost info'			=>	'暂无最新帖子信息',
+'Forum is empty'			=>	'此版块为空',
+'First post nag'			=>	'来做第一个发帖人吧',
+'Last poster'				=>	'由 %s 发布',
+'Empty board'				=>	'论坛为空',
+'Newest user'				=>	'最新注册用户：%s',
+'No of users'				=>	'注册用户总数：%s',
+'No of topics'				=>	'主题总数：%s',
+'No of posts'				=>	'帖子总数：%s',
+'Guests plural'				=>	'<strong>%s</strong> 位游客',
+'Guests single'				=>	'<strong>1</strong> 位游客',
+'Guests none'				=>	'<strong>0</strong> 位游客',
+'Users plural'				=>	'<strong>%s</strong> 位注册用户',
+'Users single'				=>	'<strong>1</strong> 位注册用户',
+'Users none'				=>	'<strong>0</strong> 位注册用户',
+'Currently online'			=>	'当前在线：%s',
+'Online stats separator'	=>	'，',
+'Online list separator'		=>	'，',
+'Statistics'				=>	'论坛统计',
+'External forum'			=>	'（此版块位于外部网站）',
+'Forum has new'				=>	'（ %s ）',
+'Forum new posts'			=>	'新帖子',
+'New posts title'			=>	'此版块包含您上次访问以来的新帖子。',
+'Board options'				=>	'论坛选项',
+'RSS active feed'			=>	'RSS 活跃主题订阅',
+'Guests online'				=>	'在线游客',
+'Users online'				=>	'在线用户'
+
+);

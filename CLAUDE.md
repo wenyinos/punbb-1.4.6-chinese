@@ -8,11 +8,11 @@ PunBB 1.4.6 中文汉化版 — 基于 PHP 的轻量论坛程序。原始代码 
 
 ## 技术栈
 
-- PHP 5+（纯过程式，无框架）
-- 数据库：MySQL 4.1.2+ / PostgreSQL 7.0+ / SQLite 2
+- PHP 8.4+（纯过程式，无框架）
+- 数据库：MySQL 5.6+ (MySQLi) / PostgreSQL 9.1+ / SQLite 3
 - 模板引擎：自研 `include/template/` 下的 `.tpl` 文件
 - 前端样式：`style/Oxygen/`（含 CSS 和图片）
-- 语言包：`lang/English/`（中文汉化在此目录内）
+- 语言包：`lang/English/`、`lang/Chinese/`
 
 ## 架构说明
 
@@ -31,7 +31,7 @@ include/common.php
 ### 关键目录
 
 - `include/` — 核心逻辑：`common.php`、`functions.php`、`parser.php`（BBCode 解析）、`email.php`
-- `include/dblayer/` — 数据库抽象层，支持 MySQL/MySQLi/PostgreSQL/SQLite，统一接口在 `common_db.php`
+- `include/dblayer/` — 数据库抽象层，支持 MySQLi/PostgreSQL/SQLite3，统一接口在 `common_db.php`
 - `include/template/` — 模板引擎：`main.tpl`（主布局）、`admin.tpl`（后台）、`redirect.tpl`、`help.tpl`
 - `admin/` — 后台管理页面（settings、users、forums、groups 等），共用 `common_admin.php`
 - `extensions/` — 插件目录，通过后台 Extensions 页面安装/启用

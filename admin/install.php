@@ -106,15 +106,6 @@ if (!isset($_POST['form_sent']))
 		$db_extensions[] = array('mysqli_innodb', 'MySQL Improved (InnoDB)');
 	}
 
-	if (function_exists('mysql_connect'))
-	{
-		$db_extensions[] = array('mysql', 'MySQL Standard');
-		$db_extensions[] = array('mysql_innodb', 'MySQL Standard (InnoDB)');
-	}
-
-	if (function_exists('sqlite_open'))
-		$db_extensions[] = array('sqlite', 'SQLite');
-
 	if (class_exists('SQLite3'))
 		$db_extensions[] = array('sqlite3', 'SQLite3');
 
@@ -369,12 +360,9 @@ if (!isset($_POST['form_sent']))
 }
 else
 {
-	//
-	// Strip slashes only if magic_quotes_gpc is on.
-	//
 	function unescape($str)
 	{
-		return (get_magic_quotes_gpc() == 1) ? stripslashes($str) : $str;
+		return stripslashes($str);
 	}
 
 

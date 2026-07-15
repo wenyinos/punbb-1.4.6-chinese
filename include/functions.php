@@ -58,14 +58,17 @@ function forum_session_start() {
 	
 	if (!isset($_SESSION))
 	{
-		session_set_cookie_params([
+		$sess_params = [
 			'lifetime' => 0,
 			'path'     => isset($cookie_path) ? $cookie_path : '/',
-			'domain'   => isset($cookie_domain) ? $cookie_domain : '',
-			'secure'   => isset($cookie_secure) ? $cookie_secure : false,
+			'secure'   => !empty($cookie_secure),
 			'httponly'  => true,
 			'samesite' => 'Lax',
-		]);
+		];
+		if (!empty($cookie_domain))
+			$sess_params['domain'] = $cookie_domain;
+
+		session_set_cookie_params($sess_params);
 		session_start();
 	}
 	
@@ -222,14 +225,17 @@ function forum_setcookie($name, $value, $expire)
 	// Enable sending of a P3P header
 	header('P3P: CP="CUR ADM"');
 
-	setcookie($name, $value, [
+	$options = [
 		'expires'  => $expire,
 		'path'     => $cookie_path,
-		'domain'   => $cookie_domain,
-		'secure'   => $cookie_secure,
+		'secure'   => !empty($cookie_secure),
 		'httponly'  => true,
 		'samesite' => 'Lax',
-	]);
+	];
+	if (!empty($cookie_domain))
+		$options['domain'] = $cookie_domain;
+
+	setcookie($name, $value, $options);
 }
 
 

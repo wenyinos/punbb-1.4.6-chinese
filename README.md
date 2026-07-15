@@ -5,6 +5,7 @@
 ## 特性
 
 - 完整简体中文语言包（`lang/Chinese/`）
+- 双主题支持：Oxygen（经典）+ Pixel（Bootstrap 5 现代风格）
 - PHP 8.4+ 兼容（已移除已弃用函数、修复类型安全）
 - bcrypt 密码哈希（自动升级旧 SHA1/MD5 哈希）
 - 增强的安全防护（CSRF、XSS、SQL 注入、会话固定、Host 头注入等）
@@ -30,10 +31,22 @@
 ├── extensions/       插件目录
 ├── include/          核心逻辑（函数、数据库抽象、模板引擎、解析器）
 ├── lang/             语言包（English/、Chinese/）
-├── style/            主题样式（Oxygen/）
+├── style/            主题样式
+│   ├── Oxygen/       经典主题
+│   └── Pixel/        Bootstrap 5 现代主题（离线运行，含 FontAwesome 6）
 ├── cache/            模板缓存
 └── img/              图片及头像
 ```
+
+## 主题
+
+### Oxygen（经典主题）
+PunBB 原版主题，轻量简洁。
+
+### Pixel（Bootstrap 5 现代主题）
+基于 [Pixel Bootstrap UI Kit](https://github.com/Themesberg/pixel-bootstrap-ui-kit) 设计，采用 Bootstrap 5 + FontAwesome 6，全离线运行，无外部 CDN 依赖。
+
+切换方式：管理后台 → 设置 → 默认样式 → 选择 `Pixel`。
 
 ## 安全审计
 
@@ -50,6 +63,7 @@
 - 密码哈希迁移至 bcrypt
 - 密码重置密钥增强至128位熵
 - 时序安全的密码比较（hash_equals）
+- bcrypt 登录 Cookie 哈希传递修复
 
 ## 扩展安装
 

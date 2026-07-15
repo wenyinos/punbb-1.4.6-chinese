@@ -55,6 +55,7 @@ if (isset($_POST['form_sent']) && empty($action))
 		if (password_verify($form_password, $db_password_hash))
 		{
 			$authorized = true;
+			$form_password_hash = $db_password_hash;
 
 			// Rehash if needed (e.g., cost change)
 			if (password_needs_rehash($db_password_hash, PASSWORD_BCRYPT))

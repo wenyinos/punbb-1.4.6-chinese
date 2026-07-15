@@ -5,6 +5,7 @@
  * Gives an overview of some statistics to administrators and moderators.
  *
  * @copyright (C) 2008-2012 PunBB, partially based on code (C) 2008-2009 FluxBB.org
+ * @copyright (C) 2026 wenyinos - Chinese localization and PHP 8.4+ port
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package PunBB
  */
@@ -70,7 +71,7 @@ if ($forum_user['g_id'] == FORUM_ADMIN)
 if (function_exists('sys_getloadavg') && is_array($load_averages = sys_getloadavg()))
 {
 	array_walk($load_averages,
-	function () use (&$v) {
+	function (&$v) {
 		$v = forum_number_format(round($v, 2), 2);
 	});
 	$server_load = $load_averages[0].' '.$load_averages[1].' '.$load_averages[2];

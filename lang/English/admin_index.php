@@ -7,7 +7,7 @@ $lang_admin_index = array(
 'Alerts'						=>	'Administrator Alerts',
 'Check for updates enabled'		=>	'This board is setup to automatically check for updates and hotfixes against the punbb.informer.com updates service.',
 'Check for updates manual'		=>	'Check for updates',	// Link text
-'Copyright message'				=>	'&copy; 2008-'.date('Y').' <a href="https://punbb.informer.com/">PunBB</a>',
+'Copyright message'				=>	'Chinese localization of PunBB 1.4.6, ported to PHP 8.4+ by <a href="https://github.com/wenyinos/punbb-1.4.6-chinese">wenyinos</a>. Original PunBB &copy; 2003&ndash;2012 <a href="https://punbb.informer.com/">PunBB</a>, GPL v2.',
 'PunBB version'					=>	'PunBB version',
 'PunBB community'				=>	'Community',
 'Forums'						=>	'Forums',

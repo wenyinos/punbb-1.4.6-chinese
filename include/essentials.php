@@ -106,8 +106,9 @@ forum_fix_request_uri();
 
 if (!isset($base_url))
 {
-	// Make an educated guess regarding base_url
-	$base_url_guess = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://').preg_replace('/:80$/', '', $_SERVER['HTTP_HOST']).str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+	// Make an educated guess regarding base_url (sanitize Host header to prevent injection)
+	$safe_host = isset($_SERVER['HTTP_HOST']) ? preg_replace('/[^a-zA-Z0-9\.\-\:]/', '', $_SERVER['HTTP_HOST']) : 'localhost';
+	$base_url_guess = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://').preg_replace('/:80$/', '', $safe_host).str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 	if (substr($base_url_guess, -1) == '/')
 		$base_url_guess = substr($base_url_guess, 0, -1);
 

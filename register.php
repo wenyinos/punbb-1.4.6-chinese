@@ -72,7 +72,7 @@ else if ($forum_config['o_rules'] == '1' && !isset($_GET['agree']) && !isset($_P
 	</div>
 	<div class="main-content main-frm">
 		<div id="rules-content" class="ct-box user-box">
-			<?php echo $forum_config['o_rules_message'] ?>
+			<?php echo forum_htmlencode($forum_config['o_rules_message']) ?>
 		</div>
 		<form class="frm-form" method="get" accept-charset="utf-8" action="<?php echo forum_link($forum_url['register']) ?>">
 <?php ($hook = get_hook('rg_rules_pre_group')) ? eval($hook) : null; ?>

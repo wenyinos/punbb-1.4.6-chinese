@@ -119,6 +119,10 @@ if (isset($_POST['form_sent']))
 			if (substr($form['avatars_dir'], -1) == '/')
 				$form['avatars_dir'] = substr($form['avatars_dir'], 0, -1);
 
+			// Prevent path traversal
+			if (strpos($form['avatars_dir'], '..') !== false)
+				$form['avatars_dir'] = 'img/avatars';
+
 			$form['avatars_width'] = intval($form['avatars_width']);
 			$form['avatars_height'] = intval($form['avatars_height']);
 			$form['avatars_size'] = intval($form['avatars_size']);

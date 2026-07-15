@@ -92,7 +92,7 @@ if ($action == 'change_pass')
 				// Did everything go according to plan?
 				if (empty($errors))
 				{
-					$new_password_hash = forum_hash($new_password1, $user['salt']);
+					$new_password_hash = forum_hash_password($new_password1);
 
 					$query = array(
 						'UPDATE'	=> 'users',
@@ -238,7 +238,7 @@ if ($action == 'change_pass')
 		{
 			$old_password_hash = forum_hash($old_password, $user['salt']);
 
-			if (($user['password'] == $old_password_hash) || $forum_user['is_admmod'])
+			if (hash_equals($user['password'], $old_password_hash) || $forum_user['is_admmod'])
 				$authorized = true;
 		}
 
@@ -248,7 +248,7 @@ if ($action == 'change_pass')
 		// Did everything go according to plan?
 		if (empty($errors))
 		{
-			$new_password_hash = forum_hash($new_password1, $user['salt']);
+			$new_password_hash = forum_hash_password($new_password1);
 
 			$query = array(
 				'UPDATE'	=> 'users',
@@ -429,7 +429,7 @@ else if ($action == 'change_email')
 	{
 		($hook = get_hook('pf_change_email_normal_form_submitted')) ? eval($hook) : null;
 
-		if (forum_hash($_POST['req_password'], $forum_user['salt']) !== $forum_user['password'])
+		if (!password_verify($_POST['req_password'], $forum_user['password']) && !hash_equals($forum_user['password'], forum_hash($_POST['req_password'], $forum_user['salt'])))
 			$errors[] = $lang_profile['Wrong password'];
 
 		if (!defined('FORUM_EMAIL_FUNCTIONS_LOADED'))

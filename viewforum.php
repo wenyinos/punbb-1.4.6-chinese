@@ -63,7 +63,11 @@ if ($cur_forum['redirect_url'] != '')
 {
 	($hook = get_hook('vf_redirect_forum_pre_redirect')) ? eval($hook) : null;
 
-	header('Location: '.$cur_forum['redirect_url']);
+	$redirect_url = $cur_forum['redirect_url'];
+	if (stripos($redirect_url, 'http://') !== 0 && stripos($redirect_url, 'https://') !== 0)
+		$redirect_url = forum_link($forum_url['index']);
+
+	header('Location: '.$redirect_url);
 	exit;
 }
 

@@ -1,47 +1,72 @@
-# PunBB
+# PunBB 1.4.6 中文汉化版
 
-PunBB is a fast and lightweight PHP-powered discussion board. It is released under the GNU General Public License. Its primary goals are to be faster, smaller and less graphically intensive as compared to other discussion boards. PunBB has fewer features than many other discussion boards, but is generally faster and outputs smaller, semantically correct XHTML-compliant pages.
+基于 [PunBB](https://punbb.informer.com/) 1.4.6 的简体中文汉化版本，已移植至 PHP 8.4+。
 
-## Quick install
- 1. [Download the latest revision of PunBB](https://punbb.informer.com/downloads.php). Decompress the PunBB archive to a directory.
- 2. Copy (or upload) all the files contained in this archive into the directory where you want to run your forums. (e.g. /home/user/www/punbb/)
- 3. Run install.php from the forum admin directory (e.g. open http://example.com/punbb/admin/install.php in your browser). Follow the instructions.
+## 特性
 
-## Requirements
- - A webserver
- - PHP 8.4 or later
- - A database where forum data is to be stored, created in one of: MySQL 5.6+ (via MySQLi), PostgreSQL 9.1+ or SQLite 3
+- 完整简体中文语言包（`lang/Chinese/`）
+- PHP 8.4+ 兼容（已移除已弃用函数、修复类型安全）
+- bcrypt 密码哈希（自动升级旧 SHA1/MD5 哈希）
+- 增强的安全防护（CSRF、XSS、SQL 注入、会话固定、Host 头注入等）
+- 支持 MySQLi 5.6+ / PostgreSQL 9.1+ / SQLite 3
 
-## Extension installation
- 1. Download an extension's archive from the PunBB extensions repository or any other place. Extract it into your forum’s extensions directory. (e.g. /home/user/example.com/punbb/extensions)
- 2. Log into the forum and go to "Administration" console, "Extensions" section, choose "Install extensions" tab (e.g. http://example.com/punbb/admin/extensions.php?section=install). The downloaded extension will be listed there.
- 3. Click the "Install extension" link to install the extension.
+## 快速安装
 
-NOTE: You may use the pun_repository official PunBB extension to download and install extensions from PunBB repository with one click.
+1. 下载并解压到 Web 服务器目录
+2. 访问 `http://你的域名/admin/install.php`，按向导操作
+3. 安装完成后建议删除或重命名 `admin/install.php` 和 `admin/db_update.php`
 
-## Contributing
+## 环境要求
 
-Please report issues on the [Github issue tracker](https://github.com/punbb/punbb/issues).
-Personal email addresses are not appropriate for bug reports.
+- Web 服务器（Apache / Nginx）
+- PHP 8.4 或更高版本
+- MySQL 5.6+（MySQLi）/ PostgreSQL 9.1+ / SQLite 3
 
-## Links
- - [Documentation](https://punbb.informer.com/wiki/)
- - [Internationalization](https://punbb.informer.com/wiki/punbb13/language_packs)
- - [Styles](https://punbb.informer.com/wiki/punbb13/syles)
- - [Extensions repository](https://punbb.informer.com/extensions/)
- - [Community Forums](https://punbb.informer.com/forums/)
- - [Twitter](https://twitter.com/punbb_forum)
- - [Development](https://github.com/punbb/punbb/)
- - [Reporting PunBB core SECURITY bugs (only!)](https://punbb.informer.com/bugreport.php)
+## 目录结构
 
-## Copyright and disclaimer
-This package and its contents are (C) 2002-2012 PunBB, all rights reserved.
-Partially based on code (C) 2008-2009 FluxBB.org.
+```
+├── admin/            后台管理页面
+├── db/               SQLite 数据库存储（受 .htaccess 保护）
+├── extensions/       插件目录
+├── include/          核心逻辑（函数、数据库抽象、模板引擎、解析器）
+├── lang/             语言包（English/、Chinese/）
+├── style/            主题样式（Oxygen/）
+├── cache/            模板缓存
+└── img/              图片及头像
+```
 
-PunBB is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+## 安全审计
 
-PunBB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+项目已通过全面安全审计，详见 [SECURITY_AUDIT_REPORT.md](SECURITY_AUDIT_REPORT.md)。
 
-You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+已修复的主要安全问题：
+- 数据库升级脚本缺少身份验证（现需管理员登录）
+- SQLite 数据库文件 Web 访问保护
+- 存储型 XSS（公告、规则、维护消息、论坛描述）
+- Host Header 注入防护
+- 开放重定向修复
+- Cookie SameSite/HttpOnly 属性
+- 会话固定防护（移除 GET 参数 Session ID）
+- 密码哈希迁移至 bcrypt
+- 密码重置密钥增强至128位熵
+- 时序安全的密码比较（hash_equals）
 
-Good luck.
+## 扩展安装
+
+1. 下载插件包，解压到 `extensions/` 目录
+2. 登录管理后台 → 扩展 → 安装扩展
+3. 点击对应扩展的"安装"链接
+
+## 许可证
+
+本项目基于 [GNU General Public License v2](http://www.gnu.org/licenses/gpl.html) 许可证发布。
+
+原 PunBB &copy; 2002-2012 PunBB，部分代码基于 FluxBB.org &copy; 2008-2009。
+中文汉化及 PHP 8.4+ 移植 &copy; 2026 [wenyinos](https://github.com/wenyinos/punbb-1.4.6-chinese)。
+
+## 链接
+
+- [原版 PunBB 官网](https://punbb.informer.com/)
+- [本项目 GitHub](https://github.com/wenyinos/punbb-1.4.6-chinese)
+- [PunBB 扩展仓库](https://punbb.informer.com/extensions/)
+- [PunBB 社区论坛](https://punbb.informer.com/forums/)

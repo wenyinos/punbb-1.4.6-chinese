@@ -39,6 +39,7 @@ if ($forum_user['g_read_board'] == '1' && $forum_config['o_quickjump'] == '1')
 
 ?>
 	<p id="copyright"><?php echo sprintf($lang_common['Powered by'], '<a href="https://punbb.informer.com/" target="_blank">PunBB</a>'.($forum_config['o_show_version'] == '1' ? ' '.$forum_config['o_cur_version'] : ''), '<a href="https://www.informer.com/" target="_blank">Informer Technologies, Inc</a>') ?></p>
+	<p id="localization">中文汉化及 PHP 8.4+ 移植：<a href="https://github.com/wenyinos/punbb-1.4.6-chinese">wenyinos</a> &copy; 2026</p>
 <?php
 
 ($hook = get_hook('ft_about_end')) ? eval($hook) : null;
@@ -84,7 +85,7 @@ if (defined('FORUM_DEBUG') || defined('FORUM_SHOW_QUERIES'))
 			forum_number_format($forum_db->get_num_queries())).'</p>'."\n";
 	}
 
-	if (defined('FORUM_SHOW_QUERIES'))
+	if (defined('FORUM_SHOW_QUERIES') && isset($forum_user) && $forum_user['g_id'] == FORUM_ADMIN)
 		echo get_saved_queries();
 
 	($hook = get_hook('ft_debug_end')) ? eval($hook) : null;

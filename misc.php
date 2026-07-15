@@ -53,7 +53,7 @@ if ($action == 'rules')
 
 	<div class="main-content main-frm">
 		<div id="rules-content" class="ct-box user-box">
-			<?php echo $forum_config['o_rules_message']."\n" ?>
+			<?php echo forum_htmlencode($forum_config['o_rules_message'])."\n" ?>
 		</div>
 	</div>
 <?php

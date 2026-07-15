@@ -132,7 +132,7 @@ while ($cur_forum = $forum_db->fetch_assoc($result))
 		$forum_page['item_status']['redirect'] = 'redirect';
 
 		if ($cur_forum['forum_desc'] != '')
-			$forum_page['item_subject']['desc'] = $cur_forum['forum_desc'];
+			$forum_page['item_subject']['desc'] = forum_htmlencode($cur_forum['forum_desc']);
 
 		$forum_page['item_subject']['redirect'] = '<span>'.$lang_index['External forum'].'</span>';
 
@@ -176,7 +176,7 @@ while ($cur_forum = $forum_db->fetch_assoc($result))
 
 		// Setup the forum description and mod list
 		if ($cur_forum['forum_desc'] != '')
-			$forum_page['item_subject']['desc'] = $cur_forum['forum_desc'];
+			$forum_page['item_subject']['desc'] = forum_htmlencode($cur_forum['forum_desc']);
 
 		if ($forum_config['o_show_moderators'] == '1' && $cur_forum['moderators'] != '')
 		{

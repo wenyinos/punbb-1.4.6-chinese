@@ -40,12 +40,7 @@ if (defined('PUN'))
 if (!defined('FORUM'))
 	exit('Cannot find config.php, are you sure it exists?');
 
-// Enable debug mode
-if (!defined('FORUM_DEBUG'))
-	define('FORUM_DEBUG', 1);
-
-// Turn on full PHP error reporting
-error_reporting(E_ALL);
+// Debug mode and error reporting: only when FORUM_DEBUG is explicitly defined in config.php
 
 // Turn off PHP time limit
 @set_time_limit(0);
@@ -78,6 +73,19 @@ define('FORUM_NO_SET_NAMES', 1);
 
 // Load DB abstraction layer and try to connect
 require FORUM_ROOT.'include/dblayer/common_db.php';
+
+// Security: require admin authentication
+if (!defined('FORUM_SKIP_AUTH'))
+{
+	forum_session_start();
+	cookie_login($forum_user);
+
+	if (!isset($forum_user) || $forum_user['g_id'] != FORUM_ADMIN)
+	{
+		http_response_code(403);
+		exit('Access denied. Only administrators can run the database update script.');
+	}
+}
 
 // Start a transaction
 $forum_db->start_transaction();

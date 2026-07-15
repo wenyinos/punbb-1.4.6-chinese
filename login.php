@@ -51,28 +51,46 @@ if (isset($_POST['form_sent']) && empty($action))
 	$authorized = false;
 	if (!empty($db_password_hash))
 	{
-		$sha1_in_db = (strlen($db_password_hash) == 40) ? true : false;
-		$form_password_hash = forum_hash($form_password, $salt);
-
-		if ($sha1_in_db && $db_password_hash == $form_password_hash)
-			$authorized = true;
-		else if ((!$sha1_in_db && $db_password_hash == md5($form_password)) || ($sha1_in_db && $db_password_hash == sha1($form_password)))
+		// Try bcrypt first (modern hash)
+		if (password_verify($form_password, $db_password_hash))
 		{
 			$authorized = true;
 
-			$salt = random_key(12);
+			// Rehash if needed (e.g., cost change)
+			if (password_needs_rehash($db_password_hash, PASSWORD_BCRYPT))
+			{
+				$new_hash = forum_hash_password($form_password);
+				$query = array(
+					'UPDATE'	=> 'users',
+					'SET'		=> 'password=\''.$forum_db->escape($new_hash).'\'',
+					'WHERE'		=> 'id='.$user_id
+				);
+				$forum_db->query_build($query) or error(__FILE__, __LINE__);
+			}
+		}
+		else
+		{
+			$sha1_in_db = (strlen($db_password_hash) == 40) ? true : false;
 			$form_password_hash = forum_hash($form_password, $salt);
 
-			// There's an old MD5 hash or an unsalted SHA1 hash in the database, so we replace it
-			// with a randomly generated salt and a new, salted SHA1 hash
-			$query = array(
-				'UPDATE'	=> 'users',
-				'SET'		=> 'password=\''.$form_password_hash.'\', salt=\''.$forum_db->escape($salt).'\'',
-				'WHERE'		=> 'id='.$user_id
-			);
+			if ($sha1_in_db && hash_equals($db_password_hash, $form_password_hash))
+				$authorized = true;
+			else if ((!$sha1_in_db && hash_equals($db_password_hash, md5($form_password))) || ($sha1_in_db && hash_equals($db_password_hash, sha1($form_password))))
+				$authorized = true;
 
-			($hook = get_hook('li_login_qr_update_user_hash')) ? eval($hook) : null;
-			$forum_db->query_build($query) or error(__FILE__, __LINE__);
+			// Upgrade old SHA1/MD5 hash to bcrypt on successful login
+			if ($authorized)
+			{
+				$new_hash = forum_hash_password($form_password);
+				$query = array(
+					'UPDATE'	=> 'users',
+					'SET'		=> 'password=\''.$forum_db->escape($new_hash).'\', salt=\''.$forum_db->escape(random_key(12)).'\'',
+					'WHERE'		=> 'id='.$user_id
+				);
+
+				($hook = get_hook('li_login_qr_update_user_hash')) ? eval($hook) : null;
+				$forum_db->query_build($query) or error(__FILE__, __LINE__);
+			}
 		}
 	}
 
@@ -250,7 +268,7 @@ else if ($action == 'forget' || $action == 'forget_2')
 						message(sprintf($lang_login['Email flood'], $forgot_pass_timeout));
 
 					// Generate a new password activation key
-					$new_password_key = random_key(8, true);
+					$new_password_key = bin2hex(random_bytes(16));
 
 					$query = array(
 						'UPDATE'	=> 'users',

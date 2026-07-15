@@ -48,8 +48,6 @@ function forum_session_start() {
 	$forum_session_id = NULL;
 	if (isset($_COOKIE['PHPSESSID']))
 		$forum_session_id = $_COOKIE['PHPSESSID'];
-	else if (isset($_GET['PHPSESSID']))
-		$forum_session_id = $_GET['PHPSESSID'];
 
 	if (empty($forum_session_id) || !preg_match('/^[a-z0-9\-,]{16,32}$/i', $forum_session_id))
 	{
@@ -60,12 +58,20 @@ function forum_session_start() {
 	
 	if (!isset($_SESSION))
 	{
+		session_set_cookie_params([
+			'lifetime' => 0,
+			'path'     => isset($cookie_path) ? $cookie_path : '/',
+			'domain'   => isset($cookie_domain) ? $cookie_domain : '',
+			'secure'   => isset($cookie_secure) ? $cookie_secure : false,
+			'httponly'  => true,
+			'samesite' => 'Lax',
+		]);
 		session_start();
 	}
 	
 	if (!isset($_SESSION['initiated']))
 	{
-		session_regenerate_id();
+		session_regenerate_id(true);
 		$_SESSION['initiated'] = TRUE;
 	}
 
@@ -186,7 +192,7 @@ function forum_fix_request_uri()
 	{
 		// Workaround for a bug in IIS7
 		if (isset($_SERVER['HTTP_X_ORIGINAL_URL']))
-			$_SERVER['REQUEST_URI'] = $_SERVER['HTTP_X_ORIGINAL_URL'];
+			$_SERVER['REQUEST_URI'] = preg_replace('/[^a-zA-Z0-9\-._~:\/\?#\[\]@!$&\'()*+,;=%]/', '', $_SERVER['HTTP_X_ORIGINAL_URL']);
 
 		// IIS6 also doesn't set REQUEST_URI, If we are using the default SEF URL scheme then we can work around it
 		else if (!isset($forum_config) || $forum_config['o_sef'] == 'Default')
@@ -216,10 +222,14 @@ function forum_setcookie($name, $value, $expire)
 	// Enable sending of a P3P header
 	header('P3P: CP="CUR ADM"');
 
-	if (version_compare(PHP_VERSION, '5.2.0', '>='))
-		setcookie($name, $value, $expire, $cookie_path, $cookie_domain, $cookie_secure, true);
-	else
-		setcookie($name, $value, $expire, $cookie_path.'; HttpOnly', $cookie_domain, $cookie_secure);
+	setcookie($name, $value, [
+		'expires'  => $expire,
+		'path'     => $cookie_path,
+		'domain'   => $cookie_domain,
+		'secure'   => $cookie_secure,
+		'httponly'  => true,
+		'samesite' => 'Lax',
+	]);
 }
 
 
@@ -1162,9 +1172,10 @@ function get_current_url($max_length = 0)
 		return $return;
 
 	$protocol = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off') ? 'http://' : 'https://';
-	$port = (isset($_SERVER['SERVER_PORT']) && (($_SERVER['SERVER_PORT'] != '80' && $protocol == 'http://') || ($_SERVER['SERVER_PORT'] != '443' && $protocol == 'https://')) && strpos($_SERVER['HTTP_HOST'], ':') === false) ? ':'.$_SERVER['SERVER_PORT'] : '';
+	$safe_host = isset($_SERVER['HTTP_HOST']) ? preg_replace('/[^a-zA-Z0-9\.\-\:]/', '', $_SERVER['HTTP_HOST']) : 'localhost';
+	$port = (isset($_SERVER['SERVER_PORT']) && (($_SERVER['SERVER_PORT'] != '80' && $protocol == 'http://') || ($_SERVER['SERVER_PORT'] != '443' && $protocol == 'https://')) && strpos($safe_host, ':') === false) ? ':'.$_SERVER['SERVER_PORT'] : '';
 
-	$url = $protocol.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI'];
+	$url = $protocol.$safe_host.$port.$_SERVER['REQUEST_URI'];
 
 	if (strlen($url) <= $max_length || $max_length == 0)
 		return $url;
@@ -1218,17 +1229,17 @@ function random_key($len, $readable = false, $hash = false)
 		return $return;
 
 	if ($hash)
-		$key = substr(sha1(uniqid(rand(), true)), 0, $len);
+		$key = substr(sha1(uniqid(random_bytes(8), true)), 0, $len);
 	else if ($readable)
 	{
 		$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 		for ($i = 0; $i < $len; ++$i)
-			$key .= substr($chars, (mt_rand() % strlen($chars)), 1);
+			$key .= $chars[random_int(0, strlen($chars) - 1)];
 	}
 	else
 		for ($i = 0; $i < $len; ++$i)
-			$key .= chr(mt_rand(33, 126));
+			$key .= chr(random_int(33, 126));
 
 	($hook = get_hook('fn_random_key_end')) ? eval($hook) : null;
 
@@ -1252,7 +1263,7 @@ function generate_form_token($target_url)
 }
 
 
-// Generates a salted, SHA-1 hash of $str
+// Generates a salted, SHA-1 hash of $str (legacy, used for cookie/token hashing)
 function forum_hash($str, $salt)
 {
 	$return = ($hook = get_hook('fn_forum_hash_start')) ? eval($hook) : null;
@@ -1260,6 +1271,13 @@ function forum_hash($str, $salt)
 		return $return;
 
 	return sha1($salt.sha1($str));
+}
+
+
+// Generates a bcrypt password hash (PHP 8.4+)
+function forum_hash_password($str)
+{
+	return password_hash($str, PASSWORD_BCRYPT);
 }
 
 
@@ -1322,8 +1340,8 @@ function authenticate_user($user, $password, $password_is_hash = false)
 	$forum_user = $forum_db->fetch_assoc($result);
 
 	if (!isset($forum_user['id']) ||
-		($password_is_hash && $password != $forum_user['password']) ||
-		(!$password_is_hash && forum_hash($password, $forum_user['salt']) != $forum_user['password']))
+		($password_is_hash && !hash_equals($forum_user['password'], $password)) ||
+		(!$password_is_hash && !password_verify($password, $forum_user['password']) && !hash_equals($forum_user['password'], forum_hash($password, $forum_user['salt']))))
 		set_default_user();
 
 	($hook = get_hook('fn_authenticate_user_end')) ? eval($hook) : null;
@@ -1362,7 +1380,7 @@ function cookie_login(&$forum_user)
 		authenticate_user(intval($cookie['user_id']), $cookie['password_hash'], true);
 
 		// We now validate the cookie hash
-		if ($cookie['expire_hash'] !== sha1($forum_user['salt'].$forum_user['password'].forum_hash(intval($cookie['expiration_time']), $forum_user['salt'])))
+		if (!hash_equals($cookie['expire_hash'], sha1($forum_user['salt'].$forum_user['password'].forum_hash(intval($cookie['expiration_time']), $forum_user['salt']))))
 			set_default_user();
 
 		// If we got back the default user, the login failed
@@ -1847,7 +1865,7 @@ function add_user($user_info, &$new_uid)
 	$query = array(
 		'INSERT'	=> 'username, group_id, password, email, email_setting, timezone, dst, language, style, registered, registration_ip, last_visit, salt, activate_key',
 		'INTO'		=> 'users',
-		'VALUES'	=> '\''.$forum_db->escape($user_info['username']).'\', '.$user_info['group_id'].', \''.$forum_db->escape($user_info['password_hash']).'\', \''.$forum_db->escape($user_info['email']).'\', '.$user_info['email_setting'].', '.floatval($user_info['timezone']).', '.$user_info['dst'].', \''.$forum_db->escape($user_info['language']).'\', \''.$forum_db->escape($user_info['style']).'\', '.$user_info['registered'].', \''.$forum_db->escape($user_info['registration_ip']).'\', '.$user_info['registered'].', \''.$forum_db->escape($user_info['salt']).'\', '.$user_info['activate_key'].''
+		'VALUES'	=> '\''.$forum_db->escape($user_info['username']).'\', '.intval($user_info['group_id']).', \''.$forum_db->escape($user_info['password_hash']).'\', \''.$forum_db->escape($user_info['email']).'\', '.$user_info['email_setting'].', '.floatval($user_info['timezone']).', '.$user_info['dst'].', \''.$forum_db->escape($user_info['language']).'\', \''.$forum_db->escape($user_info['style']).'\', '.$user_info['registered'].', \''.$forum_db->escape($user_info['registration_ip']).'\', '.$user_info['registered'].', \''.$forum_db->escape($user_info['salt']).'\', '.$user_info['activate_key'].''
 	);
 
 	($hook = get_hook('fn_add_user_qr_insert_user')) ? eval($hook) : null;
@@ -3118,7 +3136,7 @@ function maintenance_message()
 	// Deal with newlines, tabs and multiple spaces
 	$pattern = array("\t\t", '  ', '  ');
 	$replace = array('&#160; &#160; ', '&#160; ', ' &#160;');
-	$message = str_replace($pattern, $replace, $forum_config['o_maintenance_message']);
+	$message = forum_htmlencode(str_replace($pattern, $replace, $forum_config['o_maintenance_message']));
 
 	// Send the Content-type header in case the web server is setup to send something else
 	header('Content-type: text/html; charset=utf-8');

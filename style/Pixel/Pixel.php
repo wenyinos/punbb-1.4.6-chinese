@@ -21,4 +21,4 @@ $forum_loader->add_js($base_url.'/style/Pixel/vendor/bootstrap/js/bootstrap.bund
 $forum_loader->add_css($base_url.'/style/Pixel/vendor/fontawesome/css/all.min.css', array('type' => 'url', 'weight' => 6, 'group' => FORUM_CSS_GROUP_SYSTEM));
 
 // Pixel theme CSS (PunBB → Bootstrap 5 bridge) — version param for cache busting
-$forum_loader->add_css($base_url.'/style/Pixel/Pixel.min.css?v=1.3', array('type' => 'url', 'weight' => 100, 'group' => FORUM_CSS_GROUP_DEFAULT));
+$forum_loader->add_css($base_url.'/style/Pixel/Pixel.min.css?v=1.4', array('type' => 'url', 'weight' => 100, 'group' => FORUM_CSS_GROUP_DEFAULT));
